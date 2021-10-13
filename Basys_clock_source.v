@@ -55,7 +55,7 @@ begin
 endmodule
 
 
-//digital segment controller module
+//digital segment controller module which periodically refreshes to update the display
 module dig_cont(clk, an);
 input clk;
 output [3:0] an;
@@ -155,14 +155,17 @@ endmodule
 
 
 //complete clock module
-module bcd_seg_complete(CLK, BCD0, BCD1, BCD2, BCD3, AN, SEGN);
+module bcd_seg_complete(CLK, AN, SEGN);
 input CLK;
-input [3:0] BCD0;
-input [3:0] BCD1;
-input [3:0] BCD2;
-input [3:0] BCD3;
 output [3:0] AN;
 output [7:0] SEGN;
+
+wire [3:0] BCD0;
+wire [3:0] BCD1;
+wire [3:0] BCD2;
+wire [3:0] BCD3;
+clock_mod (CLK, BCD0, BCD1, BCD2, BCD3);
+
 wire [7:0] SEGN;
 reg [3:0] BCD;
 reg segn = 1;
@@ -170,6 +173,7 @@ wire w1;
 assign SEGN[7] = segn;
 
 clock_divider (CLK, w1);
+
 dig_cont (CLK, AN);
 bcd_to_sevseg (BCD, SEGN[6:0]);
 
@@ -201,17 +205,11 @@ endmodule
 
 
 //Basys 3 FPGA implementation utilizing switches as inputs
-module basys_clock(clk, seg, an);
+module basys_clock(clk, an, seg);
 input clk;
 output [7:0] seg;
 output [3:0] an;
 
-wire [3:0] BCD0;
-wire [3:0] BCD1;
-wire [3:0] BCD2;
-wire [3:0] BCD3;
-
-clock_mod (clk, BCD0, BCD1, BCD2, BCD3);
-bcd_seg_complete(clk, BCD0, BCD1, BCD2, BCD3, an, seg);
+bcd_seg_complete(clk, an, seg);
 
 endmodule
