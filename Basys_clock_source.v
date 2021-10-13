@@ -103,7 +103,7 @@ reg clk_1hz = 0;
 
 always @(posedge clk_100Mhz) begin
     counter <= counter + 1;
-    if (counter >= 499999) begin 
+    if (counter >= 49999999) begin 
     //49,999,999 outputs 1 second per second - use lower value for testing (499,999 gives 1 hour per 36 seconds).
         counter <= 0;
         clk_1hz <= !clk_1hz;
