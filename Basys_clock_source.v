@@ -11,7 +11,6 @@
 // Tool Versions: 
 // Description: Outputs a 12 hour clock using the 4-digit, 7-segment display built into the Basys-3 FPGA board. 
 //              Seconds are indicated on the decimal point for the first digit.
-//              Follow comments for changing to 24-hour clock.
 // 
 // Dependencies: 
 // Revision:
@@ -122,7 +121,7 @@ reg clk_1hz = 0;
 
 always @(posedge clk_100Mhz) begin
     counter <= counter + 1;
-    if (counter >= 49999999) begin 
+    if (counter >= 49999999) begin
     //49,999,999 outputs 1 second per second - use lower value for testing 
     //(499,999 gives 1 hour per 36 seconds)
     //(49,999 gives 1 hour per 3.6 seconds)
@@ -199,7 +198,7 @@ assign SEGN[7] = segn; //assigning 1 second period to SEGN at the decimal point
 clock_divider (CLK, w1); //obtaining a 1 second clock to use on digit 0 decimal point
 
 dig_cont (CLK, AN); //obtaining the cycling AN value for refreshing display
-bcd_to_sevseg (BCD, SEGN[6:0]); //obtaining each BCD value, and only assigning to 7 segments not decimal point
+bcd_to_sevseg (BCD, SEGN[6:0]); //obtaining each BCD value, and only assigning to main 7 segments not decimal point
 
 //assigning BCD0-3 to BCD according to current AN value
 always @(posedge CLK)
