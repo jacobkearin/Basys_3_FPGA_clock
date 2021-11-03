@@ -27,43 +27,19 @@ output [7:0] segN;
 
 reg [7:0] segN;
 //setting 7 segment values (G-A, active low) for each hexadecimal value 0-F
-always @(BCD)
-begin
-    if (BCD == 4'b0000) //0
-        segN <= 7'b1000000;
-    else if (BCD == 4'b0001) //1
-        segN <= 7'b1111001;
-    else if (BCD == 4'b0010) //2
-        segN <= 7'b0100100;
-    else if (BCD == 4'b0011) //3
-        segN <= 7'b0110000;
-    else if (BCD == 4'b0100) //4
-        segN <= 7'b0011001;
-    else if (BCD == 4'b0101) //5
-        segN <= 7'b0010010;
-    else if (BCD == 4'b0110) //6
-        segN <= 7'b0000010;
-    else if (BCD == 4'b0111) //7
-        segN <= 7'b1111000;
-    else if (BCD == 4'b1000) //8
-        segN <= 7'b0000000;
-    else if (BCD == 4'b1001) //9
-        segN <= 7'b0010000;
-    else if (BCD == 4'b1010) //A
-        segN <= 7'b0001000;
-    else if (BCD == 4'b1011) //B
-        segN <= 7'b0000011;
-    else if (BCD == 4'b1100) //C
-        segN <= 7'b1000110;
-    else if (BCD == 4'b1101) //D
-        segN <= 7'b0100001;
-    else if (BCD == 4'b1110) //E
-        segN <= 7'b0000110;
-    else if (BCD == 4'b1111) //F
-        segN <= 7'b0001100;
-    else
-        segN <= 7'b1111111;
-    end
+always @(BCD) begin
+    if (BCD == 4'b0000) segN <= 7'b1000000;
+    else if (BCD == 4'b0001) segN <= 7'b1111001;
+    else if (BCD == 4'b0010) segN <= 7'b0100100;
+    else if (BCD == 4'b0011) segN <= 7'b0110000;
+    else if (BCD == 4'b0100) segN <= 7'b0011001;
+    else if (BCD == 4'b0101) segN <= 7'b0010010;
+    else if (BCD == 4'b0110) segN <= 7'b0000010;
+    else if (BCD == 4'b0111) segN <= 7'b1111000;
+    else if (BCD == 4'b1000) segN <= 7'b0000000;
+    else if (BCD == 4'b1001) segN <= 7'b0010000;
+    else segN <= 7'b1111111;
+end
 endmodule
 
 
@@ -81,33 +57,23 @@ parameter num_digits = 4; //number of digits in display
 parameter rate = refresh_ms * 100000; //add *100,000 -------- 100,000,000 Mhz / 1,000 ms/s = 100,000
 
 // resetting counter0 every refresh_ms, and counter1 every num_digits
-always @(posedge (clk))
-begin
+always @(posedge (clk)) begin
     counter0 = counter0 + 1;
-    if (counter0 >= (rate / num_digits))
-    begin    
+    if (counter0 >= (rate / num_digits)) begin    
         counter0 = 0;
         counter1 = counter1 + 1;
-    end    
-    if (counter1 >= (num_digits))
-        counter1 = 0;
+    end 
+    if (counter1 >= (num_digits)) counter1 = 0;
 end
 
 //assigning AN value so only one digit is active low at a time
-always @(posedge(clk))
-begin
-    if (counter1 == 0)
-            an = 4'b0111;
-    else if (counter1 == 1)
-            an = 4'b1011;
-    else if (counter1 == 2)
-            an = 4'b1101;
-    else if (counter1 == 3)
-            an = 4'b1110;
-    else 
-        an <= 4'b1111;
+always @(posedge(clk)) begin
+    if (counter1 == 0) an = 4'b0111;
+    else if (counter1 == 1) an = 4'b1011;
+    else if (counter1 == 2) an = 4'b1101;
+    else if (counter1 == 3) an = 4'b1110;
+    else an <= 4'b1111;
 end
-
 endmodule
 
 
@@ -116,18 +82,18 @@ module clock_divider(clk_100Mhz, clk_1hz);
 input clk_100Mhz;
 output clk_1hz;
 
-reg [26:0] counter = 0;
+reg [25:0] counter = 0;
 reg clk_1hz = 0;
 
 always @(posedge clk_100Mhz) begin
     counter <= counter + 1;
     if (counter >= 49999999) begin
-    //49,999,999 outputs 1 second per second - use lower value for testing 
-    //(499,999 gives 1 hour per 36 seconds)
-    //(49,999 gives 1 hour per 3.6 seconds)
+        //49,999,999 outputs 1 second per second - use lower value for testing 
+        //(499,999 gives 1 hour per 36 seconds)
+        //(49,999 gives 1 hour per 3.6 seconds)
         counter <= 0;
         clk_1hz <= !clk_1hz;
-        end
+    end
 end
 endmodule
 
@@ -163,9 +129,9 @@ always @(posedge c0) begin
                 if (BCD2 == 9) begin //first hour digit
                     BCD2 <= 0;
                     BCD3 <= BCD3 + 1;
-                end
-                else if ((BCD3 == 1) && (BCD2 == 2)) begin  //second hour digit and first for reset after 12
-                //for 24-hour clock change above "if" to ((BCD3 == 2) && (BCD2 == 3))
+                end 
+                else if ((BCD3 == 1) && (BCD2 == 2)) begin  
+                    //for 24-hour clock change above "else if" to ((BCD3 == 2) && (BCD2 == 3))
                     BCD2 <= 1; // for 24-hour clock change this line to (BCD2 <= 0)
                     BCD3 <= 0;
                 end
@@ -201,33 +167,24 @@ dig_cont (CLK, AN); //obtaining the cycling AN value for refreshing display
 bcd_to_sevseg (BCD, SEGN[6:0]); //obtaining each BCD value, and only assigning to main 7 segments not decimal point
 
 //assigning BCD0-3 to BCD according to current AN value
-always @(posedge CLK)
-begin
+always @(posedge CLK) begin
     if (AN == 4'b1110) begin
         BCD <= BCD0;
-        end
-    else if (AN == 4'b1101) begin
+    end else if (AN == 4'b1101) begin
         BCD <= BCD1;
-        end
-    else if (AN == 4'b1011) begin
+    end else if (AN == 4'b1011) begin
         BCD <= BCD2;
-        end
-    else if (AN == 4'b0111) begin
+    end else if (AN == 4'b0111) begin
         BCD <= BCD3;
-        end
-    else;
+    end else;
 end
 
 //assigning segn value to 1 second clock only if writing to the last digit on the display
 always @(posedge CLK) begin
     if (AN == 4'b1110) begin
       segn <= !w1;
-    end
-    else begin
-      segn <= 1;
-    end
+    end else segn <= 1;
 end
-
 endmodule
 
 
