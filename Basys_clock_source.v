@@ -10,7 +10,7 @@
 // Target Devices: 
 // Tool Versions: 
 // Description: Outputs a 12 hour clock using the 4-digit, 7-segment display built into the Basys-3 FPGA board. 
-//              Seconds are indicated on the decimal point for the first digit.
+//              Seconds are indicated by a blinking decimal point for the first digit.
 // 
 // Dependencies: 
 // Revision:
